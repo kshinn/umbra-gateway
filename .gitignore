@@ -1,0 +1,9 @@
+.cursor
+.claude
+.env
+node_modules
+research
+vendor
+
+# Build output
+client/out

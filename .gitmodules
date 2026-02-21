@@ -1,0 +1,3 @@
+[submodule "client/src/ambire-common"]
+	path = client/src/ambire-common
+	url = git@github.com:ethereum/kohaku-commons.git

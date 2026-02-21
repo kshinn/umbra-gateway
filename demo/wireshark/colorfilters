@@ -1,0 +1,29 @@
+# Wireshark color rules for the privacy wallet demo.
+#
+# Installation:
+#   1. Open Wireshark
+#   2. Edit → Preferences → Appearance → Coloring Rules
+#   3. Click "Import" and select this file
+#      — OR —
+#   Copy to: ~/.config/wireshark/colorfilters
+#   (macOS: ~/Library/Application Support/Wireshark/colorfilters)
+#
+# Format: @<name>@<filter>@<foreground R,G,B>@<background R,G,B>
+
+# ── HIGH PRIORITY: Plaintext JSON-RPC leak (worst case) ─────────────────────
+@JSON-RPC LEAK (plaintext)@tcp contains "jsonrpc" or tcp contains "eth_getBalance" or tcp contains "eth_call" or tcp contains "eth_blockNumber"@[65535,65535,65535]@[65535,0,0]
+
+# ── RPC Provider DNS queries ─────────────────────────────────────────────────
+@RPC Provider DNS@dns.qry.name contains "base.org" or dns.qry.name contains "alchemy" or dns.qry.name contains "infura" or dns.qry.name contains "quicknode" or dns.qry.name contains "ankr"@[0,0,0]@[65535,32767,0]
+
+# ── TLS SNI revealing RPC provider (visible even in HTTPS) ───────────────────
+@RPC Provider TLS SNI@tls.handshake.extensions_server_name contains "base.org" or tls.handshake.extensions_server_name contains "alchemy" or tls.handshake.extensions_server_name contains "infura" or tls.handshake.extensions_server_name contains "quicknode"@[0,0,0]@[65535,49152,0]
+
+# ── Tor SOCKS5 (local — good, means Tor is routing) ──────────────────────────
+@Tor SOCKS5 (local)@(ip.dst == 127.0.0.1 or ip.src == 127.0.0.1) and (tcp.dstport == 9150 or tcp.dstport == 9050 or tcp.srcport == 9150 or tcp.srcport == 9050)@[0,0,0]@[0,52428,65535]
+
+# ── Any DNS at all (catch-all for privacy analysis) ──────────────────────────
+@DNS query@dns@[0,0,0]@[57311,57311,57311]
+
+# ── Ethereum wallet addresses (hex patterns) ─────────────────────────────────
+@ETH Address in packet@tcp contains "0x" and frame.len > 100@[65535,65535,65535]@[32768,0,32768]

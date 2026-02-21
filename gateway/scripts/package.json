@@ -1,0 +1,9 @@
+{
+  "name": "gateway-scripts",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "dependencies": {
+    "viem": "^2.0.0"
+  }
+}

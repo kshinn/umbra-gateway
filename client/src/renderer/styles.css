@@ -1,0 +1,64 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: #0a0a0f;
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: #12121a; }
+  ::-webkit-scrollbar-thumb { background: #2a2a3a; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a5a; }
+}
+
+@layer components {
+  .panel {
+    @apply bg-surface-1 border border-surface-3 rounded-lg p-4;
+  }
+
+  .panel-title {
+    @apply text-xs font-semibold uppercase tracking-widest text-slate-400 mb-3;
+  }
+
+  .btn {
+    @apply px-3 py-1.5 rounded text-sm font-medium transition-colors cursor-pointer border-0;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent-blue text-white hover:bg-blue-500 disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply btn bg-accent-red text-white hover:bg-red-600 disabled:opacity-40;
+  }
+
+  .btn-ghost {
+    @apply btn bg-surface-3 text-slate-300 hover:bg-surface-2;
+  }
+
+  .input {
+    @apply bg-surface-2 border border-surface-3 rounded px-3 py-1.5 text-sm text-slate-200
+           placeholder-slate-500 focus:outline-none focus:border-accent-blue w-full;
+  }
+
+  .log-line {
+    @apply flex gap-2 text-xs font-mono leading-relaxed;
+  }
+
+  .log-out   { @apply text-accent-blue; }
+  .log-in    { @apply text-accent-green; }
+  .log-info  { @apply text-slate-400; }
+  .log-error { @apply text-accent-red; }
+}

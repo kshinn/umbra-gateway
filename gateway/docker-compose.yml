@@ -1,0 +1,56 @@
+version: "3.9"
+
+# ┌───────────────────────────────────────────────────────────────────────┐
+# │  Privacy-First RPC Gateway — Docker Compose                          │
+# │                                                                       │
+# │  Services:                                                            │
+# │    proxy  — Go x402 gateway (internal only, never public)            │
+# │    tor    — Tor hidden service wrapper (.onion hostname)              │
+# │                                                                       │
+# │  Usage:                                                               │
+# │    cp .env.example .env && $EDITOR .env                              │
+# │    docker compose up -d                                               │
+# │    Wait ~30–60s for Tor to bootstrap, then get .onion address:       │
+# │      docker compose logs tor   # look for "RPC: xxxxx.onion"          │
+# │      docker compose exec tor cat /var/lib/tor/RPC/hostname           │
+# └───────────────────────────────────────────────────────────────────────┘
+
+services:
+  proxy:
+    build: .
+    # Do NOT expose port 8080 to the host — only reachable via Tor.
+    expose:
+      - "8080"
+    env_file: .env
+    restart: unless-stopped
+    networks:
+      - internal
+
+  tor:
+    # Multi-arch (linux/amd64 + linux/arm64) so it runs natively on Apple Silicon / ARM.
+    image: ghcr.io/hundehausen/tor-hidden-service:latest
+    environment:
+      # HS_NAME = target_host:target_port:onion_virtual_port → .onion:80 → proxy:8080
+      HS_RPC: "proxy:8080:80"
+    ports:
+      # Expose SOCKS so the host can use this container as Tor (e.g. curl -x socks5h://127.0.0.1:9050).
+      - "9050:9050"
+    volumes:
+      # Persist the .onion key across restarts — back this up! Path is /var/lib/tor/<HS_NAME>/.
+      - tor_keys:/var/lib/tor
+    depends_on:
+      - proxy
+    restart: unless-stopped
+    networks:
+      - internal
+
+volumes:
+  # tor_keys stores the ed25519 key pair for the hidden service.
+  # Losing this volume means losing the .onion address.
+  tor_keys:
+
+networks:
+  internal:
+    driver: bridge
+    # Not internal so proxy can reach UPSTREAM_RPC_URL and FACILITATOR_URL.
+    # Gateway is still not exposed to host (no ports: on proxy).
